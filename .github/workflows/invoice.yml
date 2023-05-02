@@ -1,0 +1,65 @@
+name: Send Email
+on:
+  #push: # Debug purposes
+  #  branches:
+  #    - main
+  schedule:
+    - cron: "0 18 27 1-12 *" # schedules a job to run at 6:00 PM on the 27th day of every month from January to December, inclusive, regardless of the day of the week.
+
+env:
+  SALARY_GROSS: ${{ secrets.SALARY_GROSS }}
+jobs:
+  create-attachment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get current time
+        uses: josStorer/get-current-time@v2 # https://github.com/josStorer/get-current-time
+        id: current-time
+        with:
+          format: YYYYMMDD
+          utcOffset: "+08:00"
+      - name: Use current time
+        env:
+          R_TIME: "${{ steps.current-time.outputs.readableTime }}"
+          MONTH: "${{ steps.current-time.outputs.month }}"
+        run: |
+          echo R_TIME="$R_TIME" >> ${GITHUB_ENV}
+          echo MONTH="$MONTH" >> ${GITHUB_ENV}
+      - name: Create invoice file # https://github.com/actions/upload-artifact
+        run: echo "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><title> INVOICE </title><style></style></head><body><article id='debc3d66-6aaa-4279-86e9-30913680c3fc' class='page sans'><header><img class='page-cover-image' src='' style='object-position:center 40%'><div class='page-header-icon page-header-icon-with-cover'><img class='icon' src=''></div><h1 class='page-title'>INVOICE / <small>Month Number:</small> <small>${{ env.MONTH }}</small></h1></header><div class='page-body'><h3 id='7809865a-5ad0-4139-906d-8d5a0b32816a' class=''>${{ env.R_TIME }}</h3><div id='eea2c910-c800-4696-b439-c3e788e35394' class='column-list'><div id='a687dbbb-fb19-4312-ab37-e420da3d094e' style='width:50%' class='column'><h3 id='2d445faa-ef14-4950-950a-e8d6846e89c2' class=''><strong>${{ secrets.NAME_CONTRACTOR }}</strong></h3><p id='662e68ae-f815-4eff-8b5f-d75e9678f114' class=''>${{ secrets.ADDRESS_CONTRACTOR }}</p></div><div id='c35158c7-caff-48f0-b07e-ff3d74f8a6f9' style='width:16.666666666666675%' class='column'><p id='d30b986d-76b0-4dc1-b153-b35c60944c79' class=''></p><p id='ae86f201-f4b6-402c-8d4d-d1158a758c1f' class=''></p><figure id='21106eab-e431-4e1a-b767-c25e3d5d92b7' class='image'><a href='INVOICE%20May%20debc3d666aaa427986e930913680c3fc/iconmonstr-angel-right-circle-thin-240.png'><img style='width:192px' src=''></a></figure></div><div id='aeab02e2-8d23-4e9c-88fb-8ee21210ea92' style='width:33.33333333333333%' class='column'><h3 id='56dfe86e-bcb9-44f0-99b9-51ba60c0ae83' class=''>${{ secrets.NAME_CLIENT }}</h3><p id='c7a15f1e-94df-4330-93e7-7d30e1fc543a' class=''>${{ secrets.ADDRESS_CLIENT }}</p></div></div><hr id='8974cbbc-d4a6-434e-9df8-4b0cdbc451c3'><p id='dfb9a74d-19b1-4404-835b-ce136739c103' class=''><mark class='highlight-blue_background'><strong>Total</strong></mark></p><h1 id='7a539b9c-f4bb-4e49-bd23-30be302de398' class=''><mark class='highlight-blue_background'><strong>${{ secrets.SALARY_GROSS }}</strong></mark></h1><hr id='1da9584b-b63c-484b-9cf6-5a061f390cd9'><div id='1089b558-d9ef-4340-b1fd-8ad4fad468f1' class='column-list'><div id='50bdb66e-871d-46d1-af4d-56d1af5b6132' style='width:50%' class='column'><p id='9306b872-c0f4-4b20-a409-7f275d9bf0c7' class=''></p></div><div id='975e51de-7a44-4177-96eb-a33d21084ab3' style='width:49.999999999999986%' class='column'><p id='44ff826a-acd7-46e5-bba5-b3073f00f63b' class=''></p></div></div><p id='7ac48a02-5e29-4fea-bfd8-2afa8ca94803' class=''></p></div></article></body></html>" > invoice.html
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: invoice.html
+          retention-days: 1
+
+  send-email:
+    runs-on: ubuntu-latest
+    needs: create-attachment
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3 # https://github.com/actions/download-artifact
+        with:
+          name: my-artifact
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Send email
+        uses: dawidd6/action-send-mail@v3 # https://github.com/marketplace/actions/send-email
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "GitHub Action - Email Notification"
+          body: |
+            Hello ${{ secrets.NAME_CLIENT }},
+
+            Attached is an invoice for a payment request regarding the last month's worth of work.
+
+            The following is an automated email from GitHub Actions for the open source project listed at: https://github.com/Jay-Plumb/invoice/. If you wish to stop receiving these emails, please contact the developer.
+          to: ${{ secrets.EMAIL_CLIENT }}
+          bcc: ${{ secrets.EMAIL_BCC }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          attachments: |
+            invoice.html
