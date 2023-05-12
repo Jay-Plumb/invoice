@@ -1,5 +1,7 @@
 # Automatic Invoicing
 
+[![Send Email](https://github.com/Jay-Plumb/invoice/actions/workflows/invoice.yml/badge.svg)](https://github.com/Jay-Plumb/invoice/actions/workflows/invoice.yml)
+
 At the end of every month, an invoice is dynamically generated and sent out to the recipient
 
 ### Secrets
