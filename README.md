@@ -17,6 +17,7 @@ The following [secrets](https://github.com/Jay-Plumb/invoice/settings/secrets/ac
 | EMAIL_BCC          | (optional) The email bcc                                                                                                                                                                                               |
 | ADDRESS_CONTRACTOR | Address of the contractor                                                                                                                                                                                              |
 | ADDRESS_CLIENT     | Address of the client                                                                                                                                                                                                  |
+| COMPANY_NAME       | Name of company                                                                                                                                                                                                        |
 
 ### Dev notes
 
