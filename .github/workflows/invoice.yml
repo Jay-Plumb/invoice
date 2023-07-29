@@ -1,13 +1,14 @@
 name: Send Email
 on:
-  #push: # Debug purposes
-  #  branches:
-  #    - main
+  push: # Debug purposes
+    branches:
+      - main
   schedule:
     - cron: "0 18 27 1-12 *" # schedules a job to run at 6:00 PM on the 27th day of every month from January to December, inclusive, regardless of the day of the week.
 
 env:
   SALARY_GROSS: ${{ secrets.SALARY_GROSS }}
+
 jobs:
   create-attachment:
     runs-on: ubuntu-latest
@@ -56,14 +57,16 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "${{ secrets.COMPANY_NAME }}'s Monthly Invoice"
+          subject: "${{ secrets.COMPANY_NAME }}'s Monthly Invoice and Expenses"
           body: |
             Hello ${{ secrets.NAME_CLIENT }},
 
             Attached is an invoice for a payment request regarding the last month's worth of work.
 
-            The following is an automated email from GitHub Actions for the open source project listed at: https://github.com/Jay-Plumb/invoice/. If you wish to stop receiving these emails, please contact the developer.
-          to: ${{ secrets.EMAIL_CLIENT }}
+            In addition, please check ${{ secrets.EXPENSES_LINK }} to review any additional expenses incurred each month.
+
+            The following is an automated email from GitHub Actions for the open source project listed at: ${{ github.repository }}. If you wish to stop receiving these emails, please contact the developer.
+          to: "jaymjplumb@gmail.com"
           bcc: ${{ secrets.EMAIL_BCC }}
           from: ${{ secrets.EMAIL_USERNAME }}
           attachments: |
