@@ -24,7 +24,7 @@ jobs:
         env:
           R_TIME: "${{ steps.current-time.outputs.readableTime }}"
           MONTH: "${{ steps.current-time.outputs.month }}"
-        run: | #${GITHUB_ENV}
+        run: |
           echo R_TIME="$R_TIME" >> GITHUB_ENV
           echo MONTH="$MONTH" >> GITHUB_ENV
 
