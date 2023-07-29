@@ -65,7 +65,7 @@ jobs:
 
             In addition, please check ${{ secrets.EXPENSES_LINK }} to review any additional expenses incurred each month.
 
-            The following is an automated email from GitHub Actions for the open source project listed at: ${{ github.repository }}. If you wish to stop receiving these emails, please contact the developer.
+            The following is an automated email from GitHub Actions for the open source project listed at:  https://github.com/${{ github.repository }}. If you wish to stop receiving these emails, please contact the developer.
           to: "jaymjplumb@gmail.com"
           bcc: ${{ secrets.EMAIL_BCC }}
           from: ${{ secrets.EMAIL_USERNAME }}
