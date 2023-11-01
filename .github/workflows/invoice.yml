@@ -1,10 +1,10 @@
 name: Send Email
 on:
-  push: # Debug purposes
+  #push: # Debug purposes
   #  branches:
   #    - main
-  #schedule:
-  #  - cron: "0 18 27 1-12 *" # schedules a job to run at 6:00 PM on the 27th day of every month from January to December, inclusive, regardless of the day of the week.
+  schedule:
+    - cron: "0 18 27 1-12 *" # schedules a job to run at 6:00 PM on the 27th day of every month from January to December, inclusive, regardless of the day of the week.
 
 env:
   SALARY_GROSS: ${{ secrets.SALARY_GROSS }}
