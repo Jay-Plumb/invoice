@@ -1,6 +1,6 @@
 name: Send Email
 on:
-  #push: # Debug purposes
+  push: # Debug purposes
   #  branches:
   #    - main
   schedule:
